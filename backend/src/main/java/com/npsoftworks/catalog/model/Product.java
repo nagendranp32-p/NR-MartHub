@@ -23,15 +23,14 @@ public class Product {
 
     private Double price;
 
-    @Lob
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     private String dimensions;
 
     private String material;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Boolean isAvailable = true;
