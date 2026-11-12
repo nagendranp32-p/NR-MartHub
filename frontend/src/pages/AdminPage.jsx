@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   PlusCircle, Trash2, Users, Package, ArrowLeft, Lock, 
-  CheckCircle2, ArrowRight, Upload, Sparkles, Image as ImageIcon, X,
+  CheckCircle2, ArrowRight, Upload, Image as ImageIcon, X,
   Tag, Edit2, AlertCircle, HelpCircle
 } from 'lucide-react';
 import { getProducts, createProduct, deleteProduct, getAllCustomerLeads } from '../services/api';
@@ -73,20 +73,30 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
     }
   }, [isAuthenticated]);
 
-  // Handle Device File Upload
+  // Handle Device File Upload with Auto-Compression (Prevents 502 RAM Crash on Render)
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Please select an image smaller than 5MB.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm((prev) => ({ ...prev, imageUrl: reader.result }));
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
+        canvas.height = img.width > MAX_WIDTH ? img.height * scaleSize : img.height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+        setForm((prev) => ({ ...prev, imageUrl: compressedBase64 }));
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   // Trigger Step 1 Confirmation Modal
@@ -132,6 +142,7 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
   // Modal Confirm Action Execution
   const handleModalConfirm = async () => {
     const modalType = confirmModal.type;
+    const targetId = confirmModal.targetId;
     setConfirmModal({ ...confirmModal, isOpen: false });
 
     if (modalType === 'step1') {
@@ -169,14 +180,14 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
         setTimeout(() => setSuccessMsg(''), 4000);
       } catch (err) {
         console.error("Save error:", err);
-        alert("Failed to save garment. Ensure Spring Boot backend is active.");
+        alert("Failed to save garment. If Render server was sleeping, wait 30 seconds and click Publish again.");
       } finally {
         setLoading(false);
       }
     } else if (modalType === 'delete') {
       try {
-        await deleteProduct(confirmModal.targetId);
-        setProducts(products.filter((p) => p.id !== confirmModal.targetId));
+        await deleteProduct(targetId);
+        setProducts(products.filter((p) => p.id !== targetId));
       } catch (err) {
         alert("Could not remove item.");
       }
@@ -370,13 +381,13 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                       />
                       <button
                         onClick={() => handleSaveEditCategory(idx)}
-                        className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold"
+                        className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingIndex(null)}
-                        className="px-2 py-1.5 bg-slate-200 text-slate-600 rounded-lg text-xs"
+                        className="px-2 py-1.5 bg-slate-200 text-slate-600 rounded-lg text-xs cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -497,7 +508,7 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-rose-300 hover:border-rose-950 rounded-2xl cursor-pointer bg-rose-50/40 hover:bg-rose-50/80 transition p-4 text-center">
                       <Upload size={28} className="text-rose-900 mb-2" />
                       <span className="text-xs font-bold text-rose-950">Click to Choose Photo</span>
-                      <span className="text-[11px] text-slate-400 mt-1">Supports JPG, PNG, WEBP (Max 5MB)</span>
+                      <span className="text-[11px] text-slate-400 mt-1">Auto-optimized for fast cloud upload</span>
                       
                       <input
                         type="file"
@@ -624,7 +635,7 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     className="w-2/3 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                   >
                     <CheckCircle2 size={18} />
-                    <span>Publish to Live Showcase</span>
+                    <span>{loading ? 'Publishing...' : 'Publish to Live Showcase'}</span>
                   </button>
                 </div>
 
@@ -723,14 +734,11 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
 
       </main>
 
-      {/* ========================================================= */}
       {/* PROFESSIONAL CENTER CONFIRMATION MODAL POPUP */}
-      {/* ========================================================= */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-rose-100 transform transition-all scale-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-rose-100">
             
-            {/* Modal Header */}
             <div className="bg-[#210D15] p-6 text-white text-center relative">
               <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
                 {confirmModal.type === 'delete' ? (
@@ -743,7 +751,6 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
               <p className="text-xs text-rose-200 mt-1">{confirmModal.message}</p>
             </div>
 
-            {/* Modal Content Preview (for product workflows) */}
             {confirmModal.type === 'step1' && (
               <div className="p-5 bg-rose-50/50 border-b border-rose-100 flex items-center gap-3.5">
                 <img 
@@ -759,7 +766,6 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
               </div>
             )}
 
-            {/* Modal Actions */}
             <div className="p-6 flex items-center gap-3">
               <button
                 type="button"
