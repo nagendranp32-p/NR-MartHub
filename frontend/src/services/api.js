@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/products';
-const LEADS_BASE_URL = 'http://localhost:8080/api/leads';
+// Render-la irukura unga backend live URL inga varum (kadasila '/' poda vendaam)
+const BASE_HOST = import.meta.env.VITE_API_URL || 'https://UNGA-RENDER-APP-NAME.onrender.com';
+
+const API_BASE_URL = `${BASE_HOST}/api/products`;
+const LEADS_BASE_URL = `${BASE_HOST}/api/leads`;
 
 // Products
 export const getProducts = async (category = '') => {
