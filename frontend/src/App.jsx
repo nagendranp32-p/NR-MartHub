@@ -6,7 +6,7 @@ import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import AdminPage from './pages/AdminPage';
 import { getProducts } from './services/api';
-import { Search, Sparkles, Award, Truck, ShieldCheck, Flame, SlidersHorizontal } from 'lucide-react';
+import { Search, Sparkles, Award, Truck, ShieldCheck, Flame, SlidersHorizontal, X } from 'lucide-react';
 
 const BOUTIQUE_COLLECTION = [
   {
@@ -73,8 +73,8 @@ export default function App() {
   // Dynamic Categories State
   const [categories, setCategories] = useState(() => {
     const savedCats = localStorage.getItem('nr_boutique_categories');
-    return savedCats 
-      ? JSON.parse(savedCats) 
+    return savedCats
+      ? JSON.parse(savedCats)
       : ['All', 'Silk Sarees', 'Kurtis & Suits', 'Bridal Lehengas', 'Mens Ethnic'];
   });
 
@@ -97,8 +97,8 @@ export default function App() {
 
   if (isAdminView) {
     return (
-      <AdminPage 
-        onBackToCatalog={() => setIsAdminView(false)} 
+      <AdminPage
+        onBackToCatalog={() => setIsAdminView(false)}
         categories={categories}
         setCategories={setCategories}
       />
@@ -107,16 +107,18 @@ export default function App() {
 
   const filteredProducts = products.filter((p) => {
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-    const matchesSearch = p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const query = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      p.name?.toLowerCase().includes(query) ||
+      p.material?.toLowerCase().includes(query) ||
+      p.description?.toLowerCase().includes(query);
     return matchesCategory && matchesSearch;
   });
 
   return (
-    <div 
-      style={{ width: '100%', minHeight: '100vh', margin: 0, padding: 0 }} 
-      className={`flex flex-col font-sans antialiased transition-colors duration-300 ${
+    <div
+      className={`w-full min-h-screen flex flex-col font-sans antialiased overflow-x-clip transition-colors duration-300 ${
         darkMode ? 'bg-[#0E060B] text-rose-100' : 'bg-[#FAF7F2] text-stone-900'
       }`}
     >
@@ -124,104 +126,111 @@ export default function App() {
       {!currentUser && <LoginModal onLoginSuccess={(user) => setCurrentUser(user)} />}
 
       {/* Navbar with Dark Mode Toggle Hook */}
-      <Navbar 
-        currentUser={currentUser} 
-        onOpenAdmin={() => setIsAdminView(true)} 
+      <Navbar
+        currentUser={currentUser}
+        onOpenAdmin={() => setIsAdminView(true)}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
 
       {/* Hero Showcase Section */}
-      <section 
-        style={{ width: '100%' }} 
-        className={`text-white py-14 lg:py-20 px-6 sm:px-12 lg:px-20 border-b shadow-xl transition-colors duration-300 ${
-          darkMode 
-            ? 'bg-gradient-to-r from-[#17050E] via-[#210915] to-[#12040B] border-rose-950/80' 
+      <section
+        className={`w-full text-white py-7 sm:py-14 lg:py-20 px-4 sm:px-8 lg:px-16 border-b shadow-xl transition-colors duration-300 ${
+          darkMode
+            ? 'bg-gradient-to-r from-[#17050E] via-[#210915] to-[#12040B] border-rose-950/80'
             : 'bg-gradient-to-r from-[#210D15] via-[#2D121D] to-[#17080E] border-rose-950/60'
         }`}
       >
-        <div style={{ width: '100%' }} className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          <div className="lg:col-span-8 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-950/80 border border-amber-500/40 text-amber-300 text-xs font-semibold tracking-wider uppercase shadow-inner">
-              <Sparkles size={14} className="text-amber-400" />
-              <span>Direct Manufacturer & Handloom Weaves</span>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-10 lg:gap-12 items-center">
+          <div className="lg:col-span-8 space-y-3.5 sm:space-y-6">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-rose-950/80 border border-amber-500/40 text-amber-300 text-[10px] sm:text-xs font-semibold tracking-wider uppercase shadow-inner">
+              <Sparkles size={13} className="text-amber-400 shrink-0" />
+              <span>Direct Manufacturer &amp; Handloom Weaves</span>
             </div>
 
-            <h1 style={{ color: '#FFFFFF' }} className="text-4xl sm:text-6xl font-black tracking-tight leading-tight font-serif drop-shadow-md">
-              Heritage Weaves & Contemporary Silks
+            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black text-white tracking-tight leading-[1.15] font-serif drop-shadow-md">
+              Heritage Weaves &amp; Contemporary Silks
             </h1>
 
-            <p style={{ color: '#F3E8E8' }} className="text-sm sm:text-base lg:text-lg max-w-3xl leading-relaxed font-light">
+            <p className="text-xs sm:text-base lg:text-lg text-[#F3E8E8] max-w-3xl leading-relaxed font-light">
               Welcome to the exclusive digital catalog of <strong>NR Mart Hub Boutique</strong>. Browse our collection of pure silk sarees, handcrafted lehengas, and designer occasion wear. Direct WhatsApp consultation for bespoke stitching, matching colors, and dispatch.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-rose-900/60 text-xs">
-              <div className="flex items-center gap-2.5 text-stone-200">
-                <Award size={18} className="text-amber-400 shrink-0" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 pt-3 sm:pt-4 border-t border-rose-900/60 text-xs">
+              <div className="flex items-center gap-2 sm:gap-2.5 text-stone-200">
+                <Award size={15} className="text-amber-400 shrink-0" />
                 <span>100% Certified Pure Fabric Quality</span>
               </div>
-              <div className="flex items-center gap-2.5 text-stone-200">
-                <Truck size={18} className="text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 sm:gap-2.5 text-stone-200">
+                <Truck size={15} className="text-amber-400 shrink-0" />
                 <span>Safe Doorstep Delivery Across India</span>
               </div>
-              <div className="flex items-center gap-2.5 text-stone-200">
-                <ShieldCheck size={18} className="text-amber-400 shrink-0" />
-                <span>Wholesale & Retail Showroom Pricing</span>
+              <div className="flex items-center gap-2 sm:gap-2.5 text-stone-200">
+                <ShieldCheck size={15} className="text-amber-400 shrink-0" />
+                <span>Wholesale &amp; Retail Showroom Pricing</span>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-4 bg-[#3B1726]/80 backdrop-blur-md border border-amber-500/20 p-7 rounded-3xl shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-rose-900/60 pb-3">
-              <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400">Order Consultation</span>
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800">
-                <Flame size={12} /> Fast Response
+          <div className="lg:col-span-4 bg-[#3B1726]/80 backdrop-blur-md border border-amber-500/20 p-4 sm:p-7 rounded-2xl sm:rounded-3xl shadow-2xl space-y-3 sm:space-y-5">
+            <div className="flex items-center justify-between border-b border-rose-900/60 pb-2.5 sm:pb-3">
+              <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-widest text-amber-400">
+                Order Consultation
+              </span>
+              <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2 sm:px-2.5 py-0.5 rounded-full border border-emerald-800">
+                <Flame size={11} /> Fast Response
               </span>
             </div>
 
-            <div className="space-y-4 text-xs sm:text-sm text-stone-200">
-              <div className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-400/30">1</span>
+            <div className="space-y-2.5 sm:space-y-4 text-xs sm:text-sm text-stone-200">
+              <div className="flex items-start gap-2.5 sm:gap-3">
+                <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 border border-amber-400/30">
+                  1
+                </span>
                 <span>Select an ensemble to view fabric specs and available sizes.</span>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-400/30">2</span>
-                <span>Click <strong>"Enquire"</strong> to connect with our showroom stylists.</span>
+              <div className="flex items-start gap-2.5 sm:gap-3">
+                <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 border border-amber-400/30">
+                  2
+                </span>
+                <span>
+                  Click <strong>&quot;Enquire&quot;</strong> to connect with our showroom stylists.
+                </span>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-400/30">3</span>
+              <div className="flex items-start gap-2.5 sm:gap-3">
+                <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 border border-amber-400/30">
+                  3
+                </span>
                 <span>Request live video showcase or confirm delivery over WhatsApp.</span>
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
       {/* Main Showcase Section */}
-      <main style={{ width: '100%' }} className="px-6 sm:px-12 lg:px-20 py-10 flex-1">
-        
+      <main className="w-full max-w-7xl mx-auto px-3.5 sm:px-8 lg:px-12 py-5 sm:py-10 flex-1">
         {/* Filter & Search Bar */}
-        <div 
-          style={{ width: '100%' }} 
-          className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 mb-8 transition-colors duration-300 ${
-            darkMode 
-              ? 'bg-[#180B13] border-rose-900/40' 
-              : 'bg-white border-stone-200'
+        <div
+          className={`p-3.5 sm:p-5 rounded-2xl border shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-5 mb-5 sm:mb-8 transition-colors duration-300 ${
+            darkMode ? 'bg-[#180B13] border-rose-900/40' : 'bg-white border-stone-200'
           }`}
         >
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <span className={`text-xs font-bold uppercase tracking-wider mr-2 flex items-center gap-1.5 ${
-              darkMode ? 'text-rose-400/70' : 'text-stone-400'
-            }`}>
-              <SlidersHorizontal size={15} /> Categories:
+          {/* Category Pills (Horizontal scroll on mobile, wrap on desktop) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 md:flex-wrap w-full md:w-auto">
+            <span
+              className={`shrink-0 text-[11px] sm:text-xs font-bold uppercase tracking-wider mr-0.5 flex items-center gap-1.5 ${
+                darkMode ? 'text-rose-400/70' : 'text-stone-400'
+              }`}
+            >
+              <SlidersHorizontal size={14} />
+              <span className="hidden sm:inline">Categories:</span>
             </span>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                   selectedCategory === cat
                     ? 'bg-rose-950 text-amber-300 border border-amber-500/40 shadow-md'
                     : darkMode
@@ -234,47 +243,71 @@ export default function App() {
             ))}
           </div>
 
-          <div className="relative w-full md:w-80">
-            <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${darkMode ? 'text-rose-400' : 'text-stone-400'}`} size={17} />
+          {/* Search Input */}
+          <div className="relative w-full md:w-80 shrink-0">
+            <Search
+              className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${
+                darkMode ? 'text-rose-400' : 'text-stone-400'
+              }`}
+              size={16}
+            />
             <input
               type="text"
               placeholder="Search silk, kurti, cotton, zari..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm font-medium border rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-900 transition ${
-                darkMode 
-                  ? 'bg-rose-950/30 border-rose-900 text-rose-100 placeholder-rose-400/50 focus:bg-rose-950/60' 
+              className={`w-full pl-9 pr-9 py-2.5 text-xs sm:text-sm font-medium border rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-900 transition ${
+                darkMode
+                  ? 'bg-rose-950/30 border-rose-900 text-rose-100 placeholder-rose-400/50 focus:bg-rose-950/60'
                   : 'bg-stone-50/60 border-stone-200 text-stone-900 focus:bg-white'
               }`}
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-rose-700 cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Counter Row */}
-        <div style={{ width: '100%' }} className="flex items-center justify-between mb-6 px-1">
-          <p className={`text-sm font-semibold ${darkMode ? 'text-rose-300/80' : 'text-stone-600'}`}>
-            Displaying <span className={`font-bold ${darkMode ? 'text-amber-300' : 'text-stone-900'}`}>{filteredProducts.length}</span> signature garments
+        <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6 px-1">
+          <p className={`text-xs sm:text-sm font-semibold ${darkMode ? 'text-rose-300/80' : 'text-stone-600'}`}>
+            Displaying{' '}
+            <span className={`font-bold ${darkMode ? 'text-amber-300' : 'text-stone-900'}`}>
+              {filteredProducts.length}
+            </span>{' '}
+            signature garments
           </p>
-          
-          {selectedCategory !== 'All' && (
+
+          {(selectedCategory !== 'All' || searchTerm) && (
             <button
-              onClick={() => setSelectedCategory('All')}
-              className="text-xs font-bold text-amber-400 hover:underline cursor-pointer"
+              onClick={() => {
+                setSelectedCategory('All');
+                setSearchTerm('');
+              }}
+              className={`shrink-0 text-xs font-bold hover:underline cursor-pointer ${
+                darkMode ? 'text-amber-400' : 'text-rose-900'
+              }`}
             >
-              Show All Collections
+              Reset Filters
             </button>
           )}
         </div>
 
         {/* Product Cards Grid */}
         {filteredProducts.length === 0 ? (
-          <div 
-            style={{ width: '100%' }} 
-            className={`text-center py-24 rounded-3xl border border-dashed ${
+          <div
+            className={`text-center py-16 sm:py-24 px-4 rounded-2xl sm:rounded-3xl border border-dashed ${
               darkMode ? 'bg-[#180B13] border-rose-900/50' : 'bg-white border-stone-300'
             }`}
           >
-            <p className={`text-base font-bold ${darkMode ? 'text-rose-200' : 'text-stone-700'}`}>
+            <p className={`text-sm sm:text-base font-bold ${darkMode ? 'text-rose-200' : 'text-stone-700'}`}>
               No garments match your current selection.
             </p>
             <p className={`text-xs mt-1 ${darkMode ? 'text-rose-400/60' : 'text-stone-400'}`}>
@@ -282,24 +315,27 @@ export default function App() {
             </p>
           </div>
         ) : (
-          <div style={{ width: '100%' }} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-4 gap-7">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-7">
             {filteredProducts.map((prod) => (
-              <ProductCard 
-                key={prod.id} 
-                product={prod} 
-                onSelect={setSelectedProduct} 
+              <ProductCard
+                key={prod.id}
+                product={prod}
+                onSelect={setSelectedProduct}
                 darkMode={darkMode}
               />
             ))}
           </div>
         )}
-
       </main>
 
-      <Footer />
+      <Footer darkMode={darkMode} />
 
       {selectedProduct && (
-        <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          darkMode={darkMode}
+        />
       )}
     </div>
   );

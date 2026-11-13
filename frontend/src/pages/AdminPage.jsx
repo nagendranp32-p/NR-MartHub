@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  PlusCircle, Trash2, Users, Package, ArrowLeft, Lock, 
+import {
+  PlusCircle, Trash2, Users, Package, ArrowLeft, Lock,
   CheckCircle2, ArrowRight, Upload, Image as ImageIcon, X,
   Tag, Edit2, AlertCircle, HelpCircle
 } from 'lucide-react';
@@ -164,7 +164,7 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
         await createProduct(payload);
 
         setSuccessMsg(`"${form.name}" has been published to live showcase!`);
-        
+
         setForm({
           name: '',
           category: categories[1] || 'Silk Sarees',
@@ -236,19 +236,24 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
   // 1. PIN Lock Screen
   if (!isAuthenticated) {
     return (
-      <div className="w-screen min-h-screen bg-[#1c0810] flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl border border-rose-200 text-center">
+      <div className="w-full min-h-screen bg-[#1c0810] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-rose-200 text-center">
           <div className="w-14 h-14 bg-rose-950 text-amber-300 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
             <Lock size={26} />
           </div>
           <h2 className="text-xl font-bold font-serif text-slate-900">NR Mart Hub Admin</h2>
           <p className="text-xs text-slate-500 mt-1 mb-6">Enter Passcode (1234) to unlock console</p>
 
-          {pinError && <p className="text-xs font-semibold text-rose-600 bg-rose-50 p-2.5 rounded-xl mb-4 border border-rose-100">{pinError}</p>}
+          {pinError && (
+            <p className="text-xs font-semibold text-rose-600 bg-rose-50 p-2.5 rounded-xl mb-4 border border-rose-100">
+              {pinError}
+            </p>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="password"
+              inputMode="numeric"
               placeholder="Enter PIN (1234)"
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value)}
@@ -274,81 +279,102 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
   }
 
   return (
-    <div className="w-screen min-h-screen bg-slate-100 flex flex-col font-sans relative">
-      
+    <div className="w-full min-h-screen bg-slate-100 flex flex-col font-sans relative overflow-x-hidden">
       {/* Top Header */}
-      <header className="bg-[#210D15] text-white w-full px-6 sm:px-12 py-4 flex items-center justify-between shadow-md">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBackToCatalog}
-            className="flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-rose-900/60 hover:bg-rose-900 px-3 py-2 rounded-xl transition cursor-pointer"
-          >
-            <ArrowLeft size={16} /> Back to Shop
-          </button>
-          <div>
-            <h1 className="text-lg font-bold font-serif">NR Mart Hub • Boutique Console</h1>
-            <p className="text-[11px] text-rose-200">Catalog & Pipeline Control</p>
+      <header className="bg-[#210D15] text-white w-full px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 shadow-md">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
+          {/* Title & Back Button */}
+          <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-4">
+            <button
+              onClick={onBackToCatalog}
+              className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-rose-900/60 hover:bg-rose-900 px-3 py-2 rounded-xl transition cursor-pointer"
+            >
+              <ArrowLeft size={15} />
+              <span>Back to Shop</span>
+            </button>
+            <div className="min-w-0 text-right sm:text-left">
+              <h1 className="text-base sm:text-lg font-bold font-serif truncate">
+                NR Mart Hub • Boutique Console
+              </h1>
+              <p className="text-[11px] text-rose-200 truncate">Catalog &amp; Pipeline Control</p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => { setActiveTab('upload'); setUploadStep(1); }}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-              activeTab === 'upload' ? 'bg-amber-400 text-rose-950 shadow-md' : 'bg-rose-900/60 text-white hover:bg-rose-900'
-            }`}
-          >
-            <PlusCircle size={15} /> Upload Product
-          </button>
+          {/* Navigation Tabs (2x2 Grid on Mobile, Flex Row on Tablet/Desktop) */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+            <button
+              onClick={() => { setActiveTab('upload'); setUploadStep(1); }}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === 'upload'
+                  ? 'bg-amber-400 text-rose-950 shadow-md'
+                  : 'bg-rose-900/60 text-white hover:bg-rose-900'
+              }`}
+            >
+              <PlusCircle size={14} className="shrink-0" />
+              <span className="truncate">Upload Product</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('categories')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-              activeTab === 'categories' ? 'bg-amber-400 text-rose-950 shadow-md' : 'bg-rose-900/60 text-white hover:bg-rose-900'
-            }`}
-          >
-            <Tag size={15} /> Manage Categories ({categories.length - 1})
-          </button>
+            <button
+              onClick={() => setActiveTab('categories')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === 'categories'
+                  ? 'bg-amber-400 text-rose-950 shadow-md'
+                  : 'bg-rose-900/60 text-white hover:bg-rose-900'
+              }`}
+            >
+              <Tag size={14} className="shrink-0" />
+              <span className="truncate">Categories ({Math.max(0, categories.length - 1)})</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('manage')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-              activeTab === 'manage' ? 'bg-amber-400 text-rose-950 shadow-md' : 'bg-rose-900/60 text-white hover:bg-rose-900'
-            }`}
-          >
-            <Package size={15} /> Live Items ({products.length})
-          </button>
+            <button
+              onClick={() => setActiveTab('manage')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === 'manage'
+                  ? 'bg-amber-400 text-rose-950 shadow-md'
+                  : 'bg-rose-900/60 text-white hover:bg-rose-900'
+              }`}
+            >
+              <Package size={14} className="shrink-0" />
+              <span className="truncate">Live Items ({products.length})</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('leads')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-              activeTab === 'leads' ? 'bg-amber-400 text-rose-950 shadow-md' : 'bg-rose-900/60 text-white hover:bg-rose-900'
-            }`}
-          >
-            <Users size={15} /> Visitor Leads ({leads.length})
-          </button>
+            <button
+              onClick={() => setActiveTab('leads')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === 'leads'
+                  ? 'bg-amber-400 text-rose-950 shadow-md'
+                  : 'bg-rose-900/60 text-white hover:bg-rose-900'
+              }`}
+            >
+              <Users size={14} className="shrink-0" />
+              <span className="truncate">Leads ({leads.length})</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Main Area */}
-      <main className="w-full px-6 sm:px-12 py-8 flex-1 max-w-7xl mx-auto">
-        
+      <main className="w-full px-3.5 sm:px-8 lg:px-12 py-5 sm:py-8 flex-1 max-w-7xl mx-auto">
         {successMsg && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-2 text-sm font-semibold shadow-xs">
-            <CheckCircle2 size={18} className="text-emerald-600" />
-            {successMsg}
+          <div className="mb-5 p-3.5 sm:p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs">
+            <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+            <span>{successMsg}</span>
           </div>
         )}
 
         {/* TAB: CATEGORIES */}
         {activeTab === 'categories' && (
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10">
-            <div className="border-b border-slate-100 pb-4 mb-6">
-              <h2 className="text-xl font-bold font-serif text-slate-900">Manage Showcase Categories</h2>
-              <p className="text-xs text-slate-500 mt-1">Add or reorganize garment groups visible on the main page filter bar.</p>
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-8 lg:p-10">
+            <div className="border-b border-slate-100 pb-4 mb-5 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold font-serif text-slate-900">
+                Manage Showcase Categories
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Add or reorganize garment groups visible on the main page filter bar.
+              </p>
             </div>
 
-            <form onSubmit={handleAddCategory} className="flex gap-3 max-w-md mb-8">
+            <form onSubmit={handleAddCategory} className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 max-w-md mb-6 sm:mb-8">
               <input
                 type="text"
                 required
@@ -359,55 +385,55 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
               />
               <button
                 type="submit"
-                className="px-5 py-3 bg-rose-950 hover:bg-rose-900 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                className="px-5 py-3 bg-rose-950 hover:bg-rose-900 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer shrink-0"
               >
                 <PlusCircle size={15} /> Add Category
               </button>
             </form>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {categories.map((cat, idx) => (
-                <div 
+                <div
                   key={cat}
-                  className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between"
+                  className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-2"
                 >
                   {editingIndex === idx ? (
-                    <div className="flex items-center gap-2 w-full">
+                    <div className="flex items-center gap-1.5 w-full">
                       <input
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="p-1.5 border border-slate-300 rounded-lg text-xs w-full bg-white font-bold"
+                        className="p-1.5 border border-slate-300 rounded-lg text-xs w-full bg-white font-bold min-w-0"
                       />
                       <button
                         onClick={() => handleSaveEditCategory(idx)}
-                        className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer"
+                        className="px-2.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold cursor-pointer shrink-0"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingIndex(null)}
-                        className="px-2 py-1.5 bg-slate-200 text-slate-600 rounded-lg text-xs cursor-pointer"
+                        className="px-2 py-1.5 bg-slate-200 text-slate-600 rounded-lg text-xs cursor-pointer shrink-0"
                       >
                         Cancel
                       </button>
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-8 h-8 rounded-xl bg-rose-100 text-rose-900 flex items-center justify-center font-bold text-xs">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="w-8 h-8 shrink-0 rounded-xl bg-rose-100 text-rose-900 flex items-center justify-center font-bold text-xs">
                           {idx + 1}
                         </span>
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">{cat}</p>
-                          <span className="text-[10px] text-slate-400">
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 text-sm truncate">{cat}</p>
+                          <span className="text-[10px] text-slate-400 block">
                             {cat === 'All' ? 'System Default' : 'Custom Category'}
                           </span>
                         </div>
                       </div>
 
                       {cat !== 'All' && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => { setEditingIndex(idx); setEditValue(cat); }}
                             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition cursor-pointer"
@@ -434,11 +460,10 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
 
         {/* TAB: UPLOAD PRODUCT */}
         {activeTab === 'upload' && (
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10">
-            
-            <div className="flex items-center justify-between border-b border-slate-100 pb-5 mb-8">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-8 lg:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 sm:pb-5 mb-6 sm:mb-8">
               <div>
-                <h2 className="text-xl font-bold font-serif text-slate-900">
+                <h2 className="text-lg sm:text-xl font-bold font-serif text-slate-900">
                   {uploadStep === 1 ? "Step 1: Choose Garment Photo & Basic Price" : "Step 2: Fabric & Specifications"}
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
@@ -446,23 +471,24 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-bold">
-                <span className={`px-3 py-1 rounded-full ${uploadStep === 1 ? 'bg-rose-950 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
-                  1. Photo & Basic Info
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold shrink-0">
+                <span className={`px-2.5 sm:px-3 py-1 rounded-full ${uploadStep === 1 ? 'bg-rose-950 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                  1. Photo &amp; Info
                 </span>
                 <span className="text-slate-300">→</span>
-                <span className={`px-3 py-1 rounded-full ${uploadStep === 2 ? 'bg-rose-950 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                  2. Specification Details
+                <span className={`px-2.5 sm:px-3 py-1 rounded-full ${uploadStep === 2 ? 'bg-rose-950 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                  2. Specifications
                 </span>
               </div>
             </div>
 
             {uploadStep === 1 && (
-              <form onSubmit={handleProceedToDetails} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                
-                <div className="space-y-5 text-xs">
+              <form onSubmit={handleProceedToDetails} className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
+                <div className="space-y-4 sm:space-y-5 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Garment Title / Model *</label>
+                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                      Garment Title / Model *
+                    </label>
                     <input
                       type="text"
                       required
@@ -473,9 +499,11 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Category *</label>
+                      <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                        Category *
+                      </label>
                       <select
                         value={form.category}
                         onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -488,9 +516,12 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Showroom Price (₹) *</label>
+                      <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                        Showroom Price (₹) *
+                      </label>
                       <input
                         type="number"
+                        inputMode="numeric"
                         required
                         placeholder="e.g. 5999"
                         value={form.price}
@@ -504,12 +535,12 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                       Select Photo From Your Device *
                     </label>
-                    
-                    <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-rose-300 hover:border-rose-950 rounded-2xl cursor-pointer bg-rose-50/40 hover:bg-rose-50/80 transition p-4 text-center">
-                      <Upload size={28} className="text-rose-900 mb-2" />
+
+                    <label className="flex flex-col items-center justify-center w-full h-32 sm:h-36 border-2 border-dashed border-rose-300 hover:border-rose-950 rounded-2xl cursor-pointer bg-rose-50/40 hover:bg-rose-50/80 transition p-4 text-center">
+                      <Upload size={26} className="text-rose-900 mb-2" />
                       <span className="text-xs font-bold text-rose-950">Click to Choose Photo</span>
                       <span className="text-[11px] text-slate-400 mt-1">Auto-optimized for fast cloud upload</span>
-                      
+
                       <input
                         type="file"
                         accept="image/*"
@@ -519,7 +550,7 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                     </label>
                   </div>
 
-                  <div className="pt-3">
+                  <div className="pt-2 sm:pt-3">
                     <button
                       type="submit"
                       className="w-full py-3.5 bg-rose-950 hover:bg-rose-900 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
@@ -530,9 +561,9 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                   </div>
                 </div>
 
-                <div className="bg-rose-50/30 border border-rose-100 p-6 rounded-2xl flex flex-col items-center justify-center min-h-[340px] text-center">
+                <div className="bg-rose-50/30 border border-rose-100 p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center min-h-[260px] sm:min-h-[340px] text-center">
                   {form.imageUrl ? (
-                    <div className="w-full max-w-xs space-y-3 relative">
+                    <div className="w-full max-w-xs space-y-2.5 sm:space-y-3 relative">
                       <button
                         type="button"
                         onClick={() => setForm({ ...form, imageUrl: '' })}
@@ -542,53 +573,56 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                         <X size={14} />
                       </button>
                       <p className="text-xs font-bold text-rose-900 uppercase tracking-wider">Photo Preview</p>
-                      <img 
-                        src={form.imageUrl} 
-                        alt="Preview" 
-                        className="w-full aspect-3/4 object-cover rounded-2xl shadow-lg border border-rose-200"
+                      <img
+                        src={form.imageUrl}
+                        alt="Preview"
+                        className="w-full aspect-[3/4] object-cover rounded-2xl shadow-lg border border-rose-200"
                       />
-                      <p className="font-bold text-slate-900 text-sm">{form.name || 'Sample Title'}</p>
+                      <p className="font-bold text-slate-900 text-sm line-clamp-1">{form.name || 'Sample Title'}</p>
                       <p className="font-black text-rose-950 text-base">₹{form.price || '0'}</p>
                     </div>
                   ) : (
                     <div className="text-slate-400 space-y-2">
-                      <ImageIcon size={44} className="mx-auto text-rose-300" />
+                      <ImageIcon size={40} className="mx-auto text-rose-300" />
                       <p className="text-xs font-semibold">No photo selected yet</p>
                       <p className="text-[11px] text-slate-400">Selected image will preview here instantly</p>
                     </div>
                   )}
                 </div>
-
               </form>
             )}
 
             {uploadStep === 2 && (
-              <form onSubmit={handleFinalPublishTrigger} className="space-y-6 text-xs max-w-2xl mx-auto">
-                <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={form.imageUrl} 
-                      alt="" 
-                      className="w-12 h-12 object-cover rounded-xl border border-amber-300 shadow-xs"
+              <form onSubmit={handleFinalPublishTrigger} className="space-y-5 sm:space-y-6 text-xs max-w-2xl mx-auto">
+                <div className="p-3.5 sm:p-4 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={form.imageUrl}
+                      alt=""
+                      className="w-12 h-12 object-cover rounded-xl border border-amber-300 shadow-xs shrink-0"
                     />
-                    <div>
-                      <span className="font-bold text-amber-950 block">{form.name}</span>
-                      <span className="text-[11px] text-amber-800">{form.category} • ₹{form.price}</span>
+                    <div className="min-w-0">
+                      <span className="font-bold text-amber-950 block truncate">{form.name}</span>
+                      <span className="text-[11px] text-amber-800 block truncate">
+                        {form.category} • ₹{form.price}
+                      </span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setUploadStep(1)}
-                    className="text-xs font-bold text-rose-900 underline cursor-pointer"
+                    className="shrink-0 text-xs font-bold text-rose-900 underline cursor-pointer"
                   >
-                    Change Photo / Price
+                    Change
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Available Sizes</label>
+                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                      Available Sizes
+                    </label>
                     <input
                       type="text"
                       placeholder="e.g. Free Size (6.3m) or S, M, L, XL"
@@ -599,7 +633,9 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Fabric Type</label>
+                    <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                      Fabric Type
+                    </label>
                     <input
                       type="text"
                       placeholder="e.g. Pure Mulberry Silk with Golden Zari"
@@ -611,7 +647,9 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Garment Description</label>
+                  <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                    Garment Description
+                  </label>
                   <textarea
                     rows={4}
                     placeholder="Weave details, border styling, contrast pallu details..."
@@ -621,125 +659,126 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                   ></textarea>
                 </div>
 
-                <div className="flex gap-4 pt-4 border-t border-slate-100">
+                <div className="flex gap-3 sm:gap-4 pt-4 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={() => setUploadStep(1)}
-                    className="w-1/3 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition cursor-pointer"
+                    className="w-1/3 py-3 sm:py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs sm:text-sm transition cursor-pointer"
                   >
                     Back
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-2/3 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    className="w-2/3 py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer disabled:opacity-60"
                   >
-                    <CheckCircle2 size={18} />
-                    <span>{loading ? 'Publishing...' : 'Publish to Live Showcase'}</span>
+                    <CheckCircle2 size={17} className="shrink-0" />
+                    <span className="truncate">{loading ? 'Publishing...' : 'Publish to Live Showcase'}</span>
                   </button>
                 </div>
-
               </form>
             )}
-
           </div>
         )}
 
         {/* TAB: MANAGE ITEMS */}
         {activeTab === 'manage' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h2 className="text-lg font-bold font-serif text-slate-900 mb-4 border-b border-slate-100 pb-3">
+          <div className="bg-white p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm">
+            <h2 className="text-base sm:text-lg font-bold font-serif text-slate-900 mb-4 border-b border-slate-100 pb-3">
               Live Showcase Items ({products.length})
             </h2>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-600">
-                <thead className="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
-                  <tr>
-                    <th className="p-3">Garment</th>
-                    <th className="p-3">Category</th>
-                    <th className="p-3">Price</th>
-                    <th className="p-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {products.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/70">
-                      <td className="p-3 flex items-center gap-3">
-                        <img
-                          src={item.imageUrl}
-                          alt=""
-                          className="w-12 h-12 object-cover rounded-xl bg-slate-100 border border-slate-200 shrink-0"
-                        />
-                        <div>
-                          <p className="font-bold text-slate-900">{item.name}</p>
-                          <p className="text-[11px] text-slate-400">{item.material}</p>
-                        </div>
-                      </td>
-                      <td className="p-3 font-semibold text-rose-900">{item.category}</td>
-                      <td className="p-3 font-bold text-slate-900">₹{item.price}</td>
-                      <td className="p-3">
-                        <button
-                          onClick={() => handleDeleteTrigger(item.id, item.name)}
-                          className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                <table className="w-full text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Garment</th>
+                      <th className="p-3">Category</th>
+                      <th className="p-3">Price</th>
+                      <th className="p-3 text-right">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {products.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50/70">
+                        <td className="p-3 flex items-center gap-2.5 sm:gap-3 min-w-[180px]">
+                          <img
+                            src={item.imageUrl}
+                            alt=""
+                            className="w-11 h-11 sm:w-12 sm:h-12 object-cover rounded-xl bg-slate-100 border border-slate-200 shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 line-clamp-1">{item.name}</p>
+                            <p className="text-[11px] text-slate-400 line-clamp-1">{item.material}</p>
+                          </div>
+                        </td>
+                        <td className="p-3 font-semibold text-rose-900 whitespace-nowrap">{item.category}</td>
+                        <td className="p-3 font-bold text-slate-900 whitespace-nowrap">₹{item.price}</td>
+                        <td className="p-3 text-right">
+                          <button
+                            onClick={() => handleDeleteTrigger(item.id, item.name)}
+                            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                            title="Delete Item"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
         {/* TAB: CUSTOMER LEADS */}
         {activeTab === 'leads' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h2 className="text-base font-bold font-serif text-slate-900 mb-4 border-b border-slate-100 pb-3">
+          <div className="bg-white p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm">
+            <h2 className="text-base sm:text-lg font-bold font-serif text-slate-900 mb-4 border-b border-slate-100 pb-3">
               Customer Leads ({leads.length})
             </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
-                  <tr>
-                    <th className="p-3">Customer Name</th>
-                    <th className="p-3">Phone</th>
-                    <th className="p-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {leads.map((lead) => (
-                    <tr key={lead.id}>
-                      <td className="p-3 font-bold text-slate-900">{lead.name}</td>
-                      <td className="p-3 text-slate-800">{lead.phoneNumber}</td>
-                      <td className="p-3">
-                        <a
-                          href={`https://wa.me/91${lead.phoneNumber.replace(/\D/g, '')}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-3 py-1 bg-emerald-600 text-white rounded-lg font-bold"
-                        >
-                          WhatsApp
-                        </a>
-                      </td>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                <table className="w-full text-left text-xs text-slate-700">
+                  <thead className="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Customer Name</th>
+                      <th className="p-3">Phone</th>
+                      <th className="p-3 text-right">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {leads.map((lead) => (
+                      <tr key={lead.id}>
+                        <td className="p-3 font-bold text-slate-900 whitespace-nowrap">{lead.name}</td>
+                        <td className="p-3 text-slate-800 whitespace-nowrap">{lead.phoneNumber}</td>
+                        <td className="p-3 text-right whitespace-nowrap">
+                          <a
+                            href={`https://wa.me/91${lead.phoneNumber.replace(/\D/g, '')}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-block px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold transition"
+                          >
+                            WhatsApp
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
-
       </main>
 
       {/* PROFESSIONAL CENTER CONFIRMATION MODAL POPUP */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-rose-100">
-            
-            <div className="bg-[#210D15] p-6 text-white text-center relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-rose-100 my-auto">
+            <div className="bg-[#210D15] p-5 sm:p-6 text-white text-center relative">
               <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
                 {confirmModal.type === 'delete' ? (
                   <AlertCircle size={24} className="text-rose-400" />
@@ -747,26 +786,26 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                   <HelpCircle size={24} className="text-amber-300" />
                 )}
               </div>
-              <h3 className="text-lg font-bold font-serif">{confirmModal.title}</h3>
+              <h3 className="text-base sm:text-lg font-bold font-serif">{confirmModal.title}</h3>
               <p className="text-xs text-rose-200 mt-1">{confirmModal.message}</p>
             </div>
 
             {confirmModal.type === 'step1' && (
-              <div className="p-5 bg-rose-50/50 border-b border-rose-100 flex items-center gap-3.5">
-                <img 
-                  src={form.imageUrl} 
-                  alt="" 
-                  className="w-14 h-14 object-cover rounded-xl border border-rose-200 shadow-xs"
+              <div className="p-4 sm:p-5 bg-rose-50/50 border-b border-rose-100 flex items-center gap-3.5">
+                <img
+                  src={form.imageUrl}
+                  alt=""
+                  className="w-14 h-14 object-cover rounded-xl border border-rose-200 shadow-xs shrink-0"
                 />
-                <div className="text-xs">
+                <div className="text-xs min-w-0">
                   <span className="font-bold text-slate-900 block line-clamp-1">{form.name}</span>
-                  <span className="text-slate-500">{form.category}</span>
+                  <span className="text-slate-500 block truncate">{form.category}</span>
                   <span className="font-black text-rose-950 block mt-0.5">₹{form.price}</span>
                 </div>
               </div>
             )}
 
-            <div className="p-6 flex items-center gap-3">
+            <div className="p-4 sm:p-6 flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
@@ -778,20 +817,18 @@ export default function AdminPage({ onBackToCatalog, categories, setCategories }
                 type="button"
                 onClick={handleModalConfirm}
                 className={`w-1/2 py-3 font-bold rounded-xl text-xs transition text-white shadow-md cursor-pointer flex items-center justify-center gap-1.5 ${
-                  confirmModal.type === 'delete' 
-                    ? 'bg-rose-600 hover:bg-rose-700' 
+                  confirmModal.type === 'delete'
+                    ? 'bg-rose-600 hover:bg-rose-700'
                     : 'bg-rose-950 hover:bg-rose-900'
                 }`}
               >
                 <span>{confirmModal.type === 'delete' ? 'Yes, Delete' : 'Confirm & Proceed'}</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} className="shrink-0" />
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }
