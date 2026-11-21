@@ -31,4 +31,13 @@ public class CustomerLeadController {
     public List<CustomerLead> getAllLeads() {
         return customerLeadRepository.findAll();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLead(@PathVariable Long id) {
+        if (!customerLeadRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        customerLeadRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

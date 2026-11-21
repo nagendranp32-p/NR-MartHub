@@ -8,8 +8,8 @@ const LEADS_BASE_URL = `${BASE_HOST}/api/leads`;
 
 // Products
 export const getProducts = async (category = '') => {
-  const url = category && category !== 'All' 
-    ? `${API_BASE_URL}?category=${encodeURIComponent(category)}` 
+  const url = category && category !== 'All'
+    ? `${API_BASE_URL}?category=${encodeURIComponent(category)}`
     : API_BASE_URL;
   const res = await axios.get(url);
   return res.data;
@@ -41,4 +41,8 @@ export const registerCustomerLead = async (name, phoneNumber) => {
 export const getAllCustomerLeads = async () => {
   const res = await axios.get(LEADS_BASE_URL);
   return res.data;
+};
+
+export const deleteCustomerLead = async (id) => {
+  await axios.delete(`${LEADS_BASE_URL}/${id}`);
 };
